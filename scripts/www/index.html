@@ -1,88 +1,935 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="./static/css/styles.css" />
-        <meta
-            http-equiv="Content-Security-Policy"
-            content="default-src * 'unsafe-inline' 'unsafe-eval'"
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Tauri App</title>
-        <script src="./static/js/main.js"></script>
-    </head>
-    <body>
-        <main class="container">
-            <h1>Welcome to TauriMan</h1>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>春晚魔术 · 分步引导版（逻辑修复）</title>
+    <style>
+        /* 样式与用户提供的完全一致，为节省篇幅此处省略，实际使用时保留原有样式 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-            <div class="row">
-                <a
-                    href="https://tauri.app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <img
-                        src="./assets/tauri.svg"
-                        class="logo tauri"
-                        alt="Tauri logo"
-                    />
-                </a>
-                <a
-                    href="https://pakeplus.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <img
-                        src="https://hk.gh-proxy.org/https://github.com/Sjj1024/PakePlus/blob/main/app-icon.png"
-                        class="logo vanilla"
-                        alt="JavaScript logo"
-                    />
-                </a>
+        body {
+            min-height: 100vh;
+            background: #1c1c1e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, 'Helvetica Neue', 'SF Pro Display', sans-serif;
+            padding: 12px;
+            margin: 0;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
+
+        .iphone-frame {
+            background: #1e1e20;
+            border-radius: 60px;
+            padding: 45px 12px 25px 12px;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.9),
+                        0 0 0 3px #3a3a3c inset,
+                        0 0 0 6px #2c2c2e;
+            position: relative;
+            max-width: 440px;
+            width: 100%;
+        }
+
+        .iphone-frame::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px;
+            height: 28px;
+            background: #0f0f0f;
+            border-radius: 20px;
+            z-index: 20;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+        }
+
+        .iphone-frame::after {
+            content: '● ●';
+            position: absolute;
+            top: 21px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #3a3a3c;
+            font-size: 12px;
+            letter-spacing: 8px;
+            z-index: 21;
+            text-shadow: 0 0 2px #1a1a1a;
+            opacity: 0.8;
+        }
+
+        .mute-key {
+            position: absolute;
+            left: -2px;
+            top: 110px;
+            width: 4px;
+            height: 30px;
+            background: #3a3a3c;
+            border-radius: 2px 0 0 2px;
+            box-shadow: inset -1px 0 #1c1c1e;
+        }
+
+        .power-key {
+            position: absolute;
+            right: -2px;
+            top: 130px;
+            width: 4px;
+            height: 45px;
+            background: #3a3a3c;
+            border-radius: 0 2px 2px 0;
+            box-shadow: inset 1px 0 #1c1c1e;
+        }
+
+        .magic-panel {
+            background: #1c1c1e;
+            border-radius: 28px;
+            padding: 18px 16px;
+            margin-bottom: 16px;
+            color: white;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.6), 0 6px 10px rgba(0,0,0,0.5);
+            border: 1px solid #3a3a3c;
+        }
+
+        .target-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            background: #2c2c2e;
+            padding: 12px 16px;
+            border-radius: 40px;
+        }
+
+        .target-label {
+            font-size: 1.1rem;
+            color: #a5a5a5;
+            font-weight: 400;
+        }
+
+        .target-value {
+            font-size: 2.2rem;
+            font-weight: 600;
+            font-family: 'SF Pro Display', monospace;
+            letter-spacing: 2px;
+            color: #f09a36;
+            text-shadow: 0 0 4px #f09a36;
+        }
+
+        .time-set-area {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .time-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .time-picker-item {
+            flex: 1;
+            background: #2c2c2e;
+            border-radius: 30px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #3a3a3c;
+        }
+
+        .time-picker-item label {
+            color: #a5a5a5;
+            font-size: 0.9rem;
+        }
+
+        .time-picker-item .time-value {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.6rem;
+            width: 80px;
+            text-align: right;
+            font-family: 'SF Pro Display', monospace;
+            font-weight: 500;
+        }
+
+        .time-picker-item .static-value {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.6rem;
+            width: 80px;
+            text-align: right;
+            font-family: 'SF Pro Display', monospace;
+            font-weight: 500;
+        }
+
+        .time-picker-item input:focus {
+            outline: none;
+        }
+
+        .confirm-btn {
+            background: #f09a36;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 20px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            transition: 0.1s;
+            width: 100%;
+            margin-top: 8px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-btn:active {
+            transform: scale(0.96);
+            filter: brightness(1.2);
+        }
+
+        .confirm-btn:disabled {
+            background: #5a5a5c;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .calculator {
+            width: 100%;
+            background: #000000;
+            border-radius: 48px;
+            padding: 12px 8px 18px 8px;
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.8);
+        }
+
+        .calculator-time {
+            background: #1c1c1e;
+            border-radius: 30px;
+            padding: 8px 12px;
+            margin: 0 4px 8px 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #3a3a3c;
+        }
+
+        .calculator-time .time-info {
+            color: #f09a36;
+            font-size: 1.2rem;
+            font-weight: 500;
+            font-family: 'SF Pro Display', monospace;
+        }
+
+        .step-indicator {
+            background: #1c1c1e;
+            border-radius: 40px;
+            padding: 14px 18px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #f09a36;
+            text-align: center;
+            border-left: 5px solid #f09a36;
+            margin: 0 4px 12px 4px;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            border: 1px solid #3a3a3c;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .display {
+            background: #000000;
+            color: white;
+            font-size: 5rem;
+            font-weight: 300;
+            text-align: right;
+            padding: 20px 16px 10px 16px;
+            min-height: 140px;
+            word-wrap: break-word;
+            word-break: break-all;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            font-family: 'SF Pro Display', monospace;
+            border-radius: 32px;
+            margin-bottom: 8px;
+            box-shadow: inset 0 -2px 8px rgba(255, 255, 255, 0.05);
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 6px 4px;
+        }
+
+        button {
+            border: none;
+            border-radius: 40px;
+            padding: 18px 8px;
+            font-size: 2.2rem;
+            font-weight: 500;
+            font-family: 'SF Pro Display', sans-serif;
+            color: white;
+            background: #333333;
+            cursor: pointer;
+            transition: filter 0.15s, background 0.1s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        button:active {
+            filter: brightness(180%);
+            transform: scale(0.96);
+        }
+
+        .zero {
+            grid-column: span 2;
+            aspect-ratio: auto;
+            justify-content: flex-start;
+            padding-left: 32px;
+        }
+
+        .function {
+            background: #a5a5a5;
+            color: #000000;
+        }
+
+        .operator {
+            background: #f09a36;
+            color: white;
+            font-size: 2.6rem;
+            font-weight: 500;
+        }
+
+        .operator:active {
+            background: #f5b064;
+        }
+
+        .number {
+            background: #333333;
+        }
+
+        #decimal {
+            background: #333333;
+            font-size: 2.8rem;
+            font-weight: 600;
+            padding-bottom: 22px;
+        }
+
+        #backspace {
+            background: #a5a5a5;
+            color: #000000;
+            font-size: 2.4rem;
+            font-weight: 500;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 400px) {
+            .iphone-frame {
+                border-radius: 45px;
+                padding: 40px 8px 20px 8px;
+            }
+            .calculator {
+                border-radius: 36px;
+                padding: 8px 4px 14px 4px;
+            }
+            .calculator-time .time-info {
+                font-size: 1rem;
+            }
+            .step-indicator {
+                font-size: 1rem;
+                padding: 12px 10px;
+                min-height: 60px;
+            }
+            .display {
+                font-size: 4rem;
+                min-height: 120px;
+                padding: 16px 12px 6px 12px;
+            }
+            button {
+                font-size: 1.8rem;
+                padding: 16px 4px;
+                border-radius: 36px;
+            }
+            .operator {
+                font-size: 2.2rem;
+            }
+            #decimal {
+                font-size: 2.4rem;
+            }
+            .zero {
+                padding-left: 24px;
+            }
+            #backspace {
+                font-size: 2rem;
+            }
+            .target-value {
+                font-size: 1.8rem;
+            }
+            .time-picker-item .time-value,
+            .time-picker-item .static-value {
+                font-size: 1.4rem;
+                width: 60px;
+            }
+            .confirm-btn {
+                height: 44px;
+                font-size: 1.1rem;
+            }
+        }
+
+        button:focus-visible {
+            outline: 2px solid #f09a36;
+            outline-offset: 2px;
+        }
+
+        .calculator::after {
+            content: '';
+            display: block;
+            height: 5px;
+            width: 140px;
+            background: #3a3a3c;
+            border-radius: 40px;
+            margin: 16px auto 2px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="iphone-frame">
+        <div class="mute-key"></div>
+        <div class="power-key"></div>
+
+        <!-- 时间设置面板 -->
+        <div class="magic-panel" id="magicPanel">
+            <div class="target-row" id="targetRow">
+                <span class="target-label">目标七位数</span>
+                <span class="target-value" id="targetDisplay">——</span>
             </div>
-            <p>Click to get data</p>
-            <form class="row" id="greet-form">
-                <input id="greet-input" placeholder="Enter a name..." />
-                <button type="submit" id="getdata">GET DATA</button>
-            </form>
-            <div class="functions">
-                <a href="./book.html" target="_self">跳转到book.html</a>
-                <a
-                    href="https://www.baidu.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    >跳到百度blank
-                </a>
-                <a
-                    href="https://www.baidu.com"
-                    target="_self"
-                    rel="noopener noreferrer"
-                >
-                    跳到百度self
-                </a>
-                <button onclick="sayHello()">点击我</button>
-                <button onclick="sayHello()">下载文件</button>
-                <button onclick="sayHello()">上传文件</button>
-                <button onclick="sayHello()">访问相机</button>
-                <button onclick="sayHello()">访问麦克风</button>
-                <button onclick="sayHello()">访问相册</button>
-                <button class="btn" onclick="openWechat()">打开微信</button>
-                <button class="btn" onclick="openWechatScan()">
-                    打开扫一扫
-                </button>
-                <button class="btn" onclick="openZhihu()">打开知乎</button>
-                <button onclick="sayHello()">打开抖音</button>
-                <button onclick="sayHello()">用浏览器打开</button>
-                <button>打开知乎</button>
+
+            <div class="time-set-area" id="timeSettingArea">
+                <div class="time-row">
+                    <div class="time-picker-item">
+                        <label>月</label>
+                        <span class="static-value">2月</span>
+                    </div>
+                    <div class="time-picker-item">
+                        <label>日</label>
+                        <span class="static-value">16日</span>
+                    </div>
+                </div>
+                <div class="time-row">
+                    <div class="time-picker-item">
+                        <label>时</label>
+                        <input type="number" class="time-value" id="hourInput" min="0" max="23" value="22" step="1">
+                    </div>
+                    <div class="time-picker-item">
+                        <label>分</label>
+                        <input type="number" class="time-value" id="minuteInput" min="0" max="59" value="27" step="1">
+                    </div>
+                </div>
+                <button class="confirm-btn" id="confirmTimeBtn">确认时间</button>
             </div>
-            <p id="greet-msg"></p>
-            <img src="./static/image/cursor.jpeg" alt="logo" />
-            <video
-                src="https://hk.gh-proxy.org/https://github.com/Sjj1024/PakePlus/blob/main/docs/static/videos/pakeplus.mp4"
-                autoplay
-                controls
-                style="width: 100%; height: 100%"
-            ></video>
-            <audio src="./static/music/yin.mp3" controls></audio>
-        </main>
-    </body>
+        </div>
+
+        <!-- 计算器界面 -->
+        <div class="calculator hidden" id="calculatorPanel">
+            <div class="calculator-time" id="calculatorTimeDisplay">
+                <span class="time-info">2月16日 · <span id="selectedTime">22:27</span></span>
+            </div>
+            <div class="step-indicator" id="stepMessage">⏳ 请先确认时间</div>
+            <div class="display" id="display">0</div>
+            <div class="buttons">
+                <button class="function" id="clear">AC</button>
+                <button class="function" id="backspace">⌫</button>
+                <button class="function" id="percent">%</button>
+                <button class="operator" id="divide">÷</button>
+
+                <button class="number" id="7">7</button>
+                <button class="number" id="8">8</button>
+                <button class="number" id="9">9</button>
+                <button class="operator" id="multiply">×</button>
+
+                <button class="number" id="4">4</button>
+                <button class="number" id="5">5</button>
+                <button class="number" id="6">6</button>
+                <button class="operator" id="subtract">−</button>
+
+                <button class="number" id="1">1</button>
+                <button class="number" id="2">2</button>
+                <button class="number" id="3">3</button>
+                <button class="operator" id="add">+</button>
+
+                <button class="number zero" id="0">0</button>
+                <button class="number" id="decimal">.</button>
+                <button class="operator" id="equals">=</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // DOM 元素
+            const displayEl = document.getElementById('display');
+            const clearBtn = document.getElementById('clear');
+            const hourInput = document.getElementById('hourInput');
+            const minuteInput = document.getElementById('minuteInput');
+            const confirmBtn = document.getElementById('confirmTimeBtn');
+            const targetDisplay = document.getElementById('targetDisplay');
+            const stepMsg = document.getElementById('stepMessage');
+            const selectedTimeEl = document.getElementById('selectedTime');
+            const magicPanel = document.getElementById('magicPanel');
+            const calculatorPanel = document.getElementById('calculatorPanel');
+
+            // 状态变量
+            let currentInput = '0';
+            let previousOperand = null;
+            let operator = null;
+            let waitingForSecond = false;
+            let clearOnNextDigit = false;
+
+            // 魔术专用
+            let step = 0;               // 0:等待确认时间; 1:等待输入四位数; 2:等待按第一次加号; 3:等待输入五位数; 4:等待按第二次加号; 5:等待随机点七下; 6:等待按等于; 7:完成
+            let firstNum = '';           // 四位数 (字符串)
+            let secondNum = '';          // 五位数 (字符串)
+            let sumAfterTwo = null;       // 四位数+五位数的和
+            let magicSeven = '';           // 计算好的七位数
+            let magicIndex = 0;            // 已点次数
+            let targetNumber = 0;           // 目标七位数
+
+            // 辅助函数：更新显示
+            function updateDisplay() {
+                if (currentInput.length > 16) {
+                    currentInput = parseFloat(currentInput).toExponential(6).toString();
+                }
+                displayEl.innerText = currentInput;
+                updateClearButton();
+            }
+
+            function updateClearButton() {
+                if (currentInput === '0' && operator === null && !waitingForSecond && previousOperand === null && step < 5) {
+                    clearBtn.innerText = 'AC';
+                } else {
+                    clearBtn.innerText = 'C';
+                }
+            }
+
+            // 晃动提示
+            function shakeStepMessage() {
+                stepMsg.classList.add('shake');
+                setTimeout(() => stepMsg.classList.remove('shake'), 400);
+            }
+
+            // 完全重置到初始状态（显示时间设置，隐藏计算器）
+            function fullReset() {
+                magicPanel.classList.remove('hidden');
+                calculatorPanel.classList.add('hidden');
+                hourInput.disabled = false;
+                minuteInput.disabled = false;
+                confirmBtn.disabled = false;
+                step = 0;
+                stepMsg.innerText = '⏳ 请先确认时间';
+                targetDisplay.innerText = '——';
+                allClear();
+            }
+
+            // 确认时间
+            function confirmTime() {
+                let h = parseInt(hourInput.value, 10);
+                let m = parseInt(minuteInput.value, 10);
+                h = isNaN(h) ? 22 : Math.min(23, Math.max(0, h));
+                m = isNaN(m) ? 27 : Math.min(59, Math.max(0, m));
+                hourInput.value = h;
+                minuteInput.value = m;
+
+                const formattedHour = h.toString().padStart(2, '0');
+                const formattedMinute = m.toString().padStart(2, '0');
+                selectedTimeEl.innerText = `${formattedHour}:${formattedMinute}`;
+
+                // 目标数字 = 2160000 + 小时*100 + 分钟
+                targetNumber = 2160000 + (h * 100) + m;
+                targetDisplay.innerText = targetNumber.toString().padStart(7, '0');
+
+                // 切换界面
+                magicPanel.classList.add('hidden');
+                calculatorPanel.classList.remove('hidden');
+
+                hourInput.disabled = true;
+                minuteInput.disabled = true;
+                confirmBtn.disabled = true;
+
+                // 进入步骤1
+                step = 1;
+                stepMsg.innerText = '① 请输入一个四位数';
+                allClear();
+            }
+
+            // 完全重置 (AC)
+            function allClear() {
+                currentInput = '0';
+                previousOperand = null;
+                operator = null;
+                waitingForSecond = false;
+                clearOnNextDigit = false;
+                firstNum = '';
+                secondNum = '';
+                sumAfterTwo = null;
+                magicSeven = '';
+                magicIndex = 0;
+
+                if (step >= 1 && step <= 6) {
+                    step = 1;
+                    stepMsg.innerText = '① 请输入一个四位数';
+                } else {
+                    step = 0;
+                    stepMsg.innerText = '⏳ 请先确认时间';
+                    fullReset();
+                }
+                updateDisplay();
+            }
+
+            // 清除当前输入逻辑 (C)
+            function clearEntry() {
+                if (step === 0) return;
+                currentInput = '0';
+                clearOnNextDigit = false;
+
+                if (operator === null && !waitingForSecond && step < 5) {
+                    if (step === 1) {
+                        firstNum = '';
+                        stepMsg.innerText = '① 请输入一个四位数';
+                    } else if (step === 3) {
+                        secondNum = '';
+                        stepMsg.innerText = '③ 请输入一个五位数';
+                    } else if (step === 2) {
+                        firstNum = '';
+                        step = 1;
+                        stepMsg.innerText = '① 请输入一个四位数';
+                    } else if (step === 4) {
+                        secondNum = '';
+                        step = 3;
+                        stepMsg.innerText = '③ 请输入一个五位数';
+                    }
+                }
+                updateDisplay();
+            }
+
+            // 退格 (删除个位数)
+            function backspace() {
+                if (step === 0 || step >= 5) return;
+
+                if (step === 1 || step === 2) {
+                    if (firstNum.length > 0) {
+                        firstNum = firstNum.slice(0, -1);
+                        currentInput = firstNum || '0';
+                        step = 1;
+                        if (firstNum.length === 0) {
+                            stepMsg.innerText = '① 请输入一个四位数';
+                        } else {
+                            stepMsg.innerText = `① 请输入一个四位数 (${firstNum.length}/4)`;
+                        }
+                    }
+                } else if (step === 3 || step === 4) {
+                    if (secondNum.length > 0) {
+                        secondNum = secondNum.slice(0, -1);
+                        currentInput = secondNum || '0';
+                        step = 3;
+                        if (secondNum.length === 0) {
+                            stepMsg.innerText = '③ 请输入一个五位数';
+                        } else {
+                            stepMsg.innerText = `③ 请输入一个五位数 (${secondNum.length}/5)`;
+                        }
+                    }
+                }
+                updateDisplay();
+            }
+
+            // 数字输入
+            function inputDigit(digit) {
+                if (step === 0) {
+                    shakeStepMessage();
+                    return;
+                }
+
+                // 魔术点按阶段 (step 5)
+                if (step === 5) {
+                    if (magicIndex >= 7) {
+                        stepMsg.innerText = '⑤ 七位已输完，请按 =';
+                        return;
+                    }
+                    if (digit === '.') return; // 忽略小数点
+
+                    // 强制填入预定的七位数当前位
+                    const requiredDigit = magicSeven[magicIndex];
+                    if (magicIndex === 0) {
+                        currentInput = requiredDigit;
+                    } else {
+                        currentInput += requiredDigit;
+                    }
+                    magicIndex++;
+                    updateDisplay();
+
+                    if (magicIndex === 7) {
+                        step = 6;
+                        stepMsg.innerText = '⑥ 请按 = 得到结果';
+                    } else {
+                        stepMsg.innerText = `⑤ 随机点按 (${magicIndex}/7)`;
+                    }
+                    return;
+                }
+
+                // 普通输入步骤
+                if (step === 1 || step === 2) {
+                    if (step === 2) {
+                        shakeStepMessage();
+                        return;
+                    }
+                    if (firstNum.length >= 4) {
+                        shakeStepMessage();
+                        return;
+                    }
+                    if (digit === '.') return;
+
+                    firstNum += digit;
+                    currentInput = firstNum;
+                    if (firstNum.length === 4) {
+                        step = 2;
+                        stepMsg.innerText = '② 请按加号 +';
+                    } else {
+                        stepMsg.innerText = `① 请输入一个四位数 (${firstNum.length}/4)`;
+                    }
+                    updateDisplay();
+                } else if (step === 3 || step === 4) {
+                    if (step === 4) {
+                        shakeStepMessage();
+                        return;
+                    }
+                    if (secondNum.length >= 5) {
+                        shakeStepMessage();
+                        return;
+                    }
+                    if (digit === '.') return;
+
+                    secondNum += digit;
+                    currentInput = secondNum;
+                    if (secondNum.length === 5) {
+                        step = 4;
+                        stepMsg.innerText = '④ 请再按一次加号 +';
+                    } else {
+                        stepMsg.innerText = `③ 请输入一个五位数 (${secondNum.length}/5)`;
+                    }
+                    updateDisplay();
+                } else {
+                    shakeStepMessage();
+                }
+            }
+
+            // 处理加号
+            function handlePlus() {
+                if (step === 0) {
+                    shakeStepMessage();
+                    return;
+                }
+
+                if (step === 2) {
+                    if (firstNum.length === 4) {
+                        previousOperand = parseFloat(firstNum);
+                        currentInput = firstNum;
+                        operator = '+';
+                        waitingForSecond = true;
+                        clearOnNextDigit = true;
+                        step = 3;
+                        stepMsg.innerText = '③ 请输入一个五位数';
+                        updateDisplay();
+                    } else {
+                        shakeStepMessage();
+                    }
+                } else if (step === 4) {
+                    if (secondNum.length === 5) {
+                        const first = parseFloat(firstNum);
+                        const second = parseFloat(secondNum);
+                        sumAfterTwo = first + second;
+
+                        // 计算需要的魔术数字（目标数 - 前两个数的和）
+                        const diff = targetNumber - sumAfterTwo;
+                        if (diff < 0 || diff > 9999999) {
+                            stepMsg.innerText = '❌ 数值超出范围，请按AC重置';
+                            return;
+                        }
+                        magicSeven = diff.toString().padStart(7, '0');
+                        if (magicSeven.length !== 7) {
+                            stepMsg.innerText = '❌ 计算错误，请重试';
+                            return;
+                        }
+
+                        // 显示前两个数的和（让观众看到结果）
+                        currentInput = sumAfterTwo.toString();
+                        previousOperand = sumAfterTwo;
+                        operator = null;  // 清除运算符，准备进入点按阶段
+                        waitingForSecond = false;
+                        clearOnNextDigit = true;
+
+                        step = 5;
+                        magicIndex = 0;
+                        stepMsg.innerText = '⑤ 请随机点7下数字 (任意键)';
+                        updateDisplay();
+                    } else {
+                        shakeStepMessage();
+                    }
+                } else {
+                    shakeStepMessage();
+                }
+            }
+
+            // 处理等于
+            function handleEquals() {
+                if (step === 6) {
+                    if (magicIndex !== 7) {
+                        shakeStepMessage();
+                        return;
+                    }
+                    // 此时 currentInput 应该已经是 magicSeven 的七位数
+                    // 最终结果 = sumAfterTwo + parseInt(magicSeven) 应该等于 targetNumber
+                    const finalSum = sumAfterTwo + parseInt(magicSeven);
+                    currentInput = finalSum.toString().padStart(7, '0');
+                    step = 7;
+                    stepMsg.innerText = `✨ 魔术成功！得到目标数: ${targetNumber}`;
+                    updateDisplay();
+                } else {
+                    shakeStepMessage();
+                }
+            }
+
+            // 其他运算符禁用
+            function handleOtherOperator() {
+                if (step !== 0) shakeStepMessage();
+            }
+
+            function handlePercent() {
+                if (step !== 0) shakeStepMessage();
+            }
+
+            // 清除按钮逻辑
+            function handleClear() {
+                if (step === 0) return;
+                if (clearBtn.innerText === 'AC') {
+                    allClear();
+                } else {
+                    clearEntry();
+                }
+            }
+
+            // 事件绑定
+            confirmBtn.addEventListener('click', confirmTime);
+
+            document.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const id = btn.id;
+                    const text = btn.innerText;
+
+                    if (id === 'clear') {
+                        handleClear();
+                    } else if (id === 'backspace') {
+                        backspace();
+                    } else if (id === 'percent') {
+                        handlePercent();
+                    } else if (id === 'divide' || id === 'multiply' || id === 'subtract') {
+                        handleOtherOperator();
+                    } else if (id === 'add') {
+                        handlePlus();
+                    } else if (id === 'equals') {
+                        handleEquals();
+                    } else if (['0','1','2','3','4','5','6','7','8','9','decimal'].includes(id)) {
+                        inputDigit(text);
+                    }
+                });
+            });
+
+            // 键盘支持
+            document.addEventListener('keydown', (e) => {
+                const key = e.key;
+                if (key >= '0' && key <= '9') {
+                    e.preventDefault();
+                    inputDigit(key);
+                }
+                if (key === '+') {
+                    e.preventDefault();
+                    handlePlus();
+                }
+                if (key === '=' || key === 'Enter') {
+                    e.preventDefault();
+                    handleEquals();
+                }
+                if (key === 'Backspace') {
+                    e.preventDefault();
+                    backspace();
+                }
+                if (key === 'Escape') {
+                    e.preventDefault();
+                    handleClear();
+                }
+                if (['-', '*', '/', '%', '.'].includes(key)) {
+                    e.preventDefault();
+                    if (step !== 0) shakeStepMessage();
+                }
+            });
+
+            // 初始化
+            function init() {
+                magicPanel.classList.remove('hidden');
+                calculatorPanel.classList.add('hidden');
+                hourInput.disabled = false;
+                minuteInput.disabled = false;
+                confirmBtn.disabled = false;
+                step = 0;
+                stepMsg.innerText = '⏳ 请先确认时间';
+                targetDisplay.innerText = '——';
+                allClear();
+
+                hourInput.addEventListener('input', () => {
+                    hourInput.value = hourInput.value.replace(/\D/g, '');
+                });
+                minuteInput.addEventListener('input', () => {
+                    minuteInput.value = minuteInput.value.replace(/\D/g, '');
+                });
+            }
+
+            init();
+        })();
+    </script>
+</body>
 </html>
