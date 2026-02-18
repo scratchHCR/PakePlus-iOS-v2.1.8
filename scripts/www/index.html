@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>春晚魔术 · 分步引导版（逻辑修复）</title>
+    <title>春晚魔术 · 静默处理版</title>
     <style>
-        /* 样式与用户提供的完全一致，为节省篇幅此处省略，实际使用时保留原有样式 */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,7 +15,7 @@
 
         body {
             min-height: 100vh;
-            background: #1c1c1e;
+            background: #000000;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -25,89 +24,17 @@
             margin: 0;
         }
 
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            20% { transform: translateX(-8px); }
-            40% { transform: translateX(8px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
-            100% { transform: translateX(0); }
-        }
-
-        .shake {
-            animation: shake 0.3s ease-in-out;
-        }
-
-        .iphone-frame {
-            background: #1e1e20;
-            border-radius: 60px;
-            padding: 45px 12px 25px 12px;
-            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.9),
-                        0 0 0 3px #3a3a3c inset,
-                        0 0 0 6px #2c2c2e;
-            position: relative;
-            max-width: 440px;
-            width: 100%;
-        }
-
-        .iphone-frame::before {
-            content: '';
-            position: absolute;
-            top: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 130px;
-            height: 28px;
-            background: #0f0f0f;
-            border-radius: 20px;
-            z-index: 20;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
-        }
-
-        .iphone-frame::after {
-            content: '● ●';
-            position: absolute;
-            top: 21px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #3a3a3c;
-            font-size: 12px;
-            letter-spacing: 8px;
-            z-index: 21;
-            text-shadow: 0 0 2px #1a1a1a;
-            opacity: 0.8;
-        }
-
-        .mute-key {
-            position: absolute;
-            left: -2px;
-            top: 110px;
-            width: 4px;
-            height: 30px;
-            background: #3a3a3c;
-            border-radius: 2px 0 0 2px;
-            box-shadow: inset -1px 0 #1c1c1e;
-        }
-
-        .power-key {
-            position: absolute;
-            right: -2px;
-            top: 130px;
-            width: 4px;
-            height: 45px;
-            background: #3a3a3c;
-            border-radius: 0 2px 2px 0;
-            box-shadow: inset 1px 0 #1c1c1e;
-        }
-
+        /* 魔术面板（时间设置） */
         .magic-panel {
             background: #1c1c1e;
             border-radius: 28px;
             padding: 18px 16px;
             margin-bottom: 16px;
             color: white;
-            box-shadow: inset 0 2px 6px rgba(0,0,0,0.6), 0 6px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
             border: 1px solid #3a3a3c;
+            width: 100%;
+            max-width: 400px;
         }
 
         .target-row {
@@ -194,7 +121,7 @@
             background: #f09a36;
             border: none;
             border-radius: 40px;
-            padding: 8px 20px;
+            padding: 6px 20px;
             color: white;
             font-weight: 600;
             font-size: 1.2rem;
@@ -203,7 +130,7 @@
             transition: 0.1s;
             width: 100%;
             margin-top: 8px;
-            height: 48px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -220,49 +147,14 @@
             pointer-events: none;
         }
 
+        /* 计算器面板 */
         .calculator {
             width: 100%;
+            max-width: 400px;
             background: #000000;
             border-radius: 48px;
-            padding: 12px 8px 18px 8px;
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.8);
-        }
-
-        .calculator-time {
-            background: #1c1c1e;
-            border-radius: 30px;
-            padding: 8px 12px;
-            margin: 0 4px 8px 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #3a3a3c;
-        }
-
-        .calculator-time .time-info {
-            color: #f09a36;
-            font-size: 1.2rem;
-            font-weight: 500;
-            font-family: 'SF Pro Display', monospace;
-        }
-
-        .step-indicator {
-            background: #1c1c1e;
-            border-radius: 40px;
-            padding: 14px 18px;
-            font-size: 1.2rem;
-            font-weight: 500;
-            color: #f09a36;
-            text-align: center;
-            border-left: 5px solid #f09a36;
-            margin: 0 4px 12px 4px;
-            min-height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-            border: 1px solid #3a3a3c;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            padding: 20px 12px 24px 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
         }
 
         .display {
@@ -360,21 +252,9 @@
         }
 
         @media (max-width: 400px) {
-            .iphone-frame {
-                border-radius: 45px;
-                padding: 40px 8px 20px 8px;
-            }
             .calculator {
                 border-radius: 36px;
-                padding: 8px 4px 14px 4px;
-            }
-            .calculator-time .time-info {
-                font-size: 1rem;
-            }
-            .step-indicator {
-                font-size: 1rem;
-                padding: 12px 10px;
-                min-height: 60px;
+                padding: 16px 8px 20px 8px;
             }
             .display {
                 font-size: 4rem;
@@ -407,96 +287,72 @@
                 width: 60px;
             }
             .confirm-btn {
-                height: 44px;
+                height: 38px;
                 font-size: 1.1rem;
             }
-        }
-
-        button:focus-visible {
-            outline: 2px solid #f09a36;
-            outline-offset: 2px;
-        }
-
-        .calculator::after {
-            content: '';
-            display: block;
-            height: 5px;
-            width: 140px;
-            background: #3a3a3c;
-            border-radius: 40px;
-            margin: 16px auto 2px auto;
         }
     </style>
 </head>
 <body>
-    <div class="iphone-frame">
-        <div class="mute-key"></div>
-        <div class="power-key"></div>
-
-        <!-- 时间设置面板 -->
-        <div class="magic-panel" id="magicPanel">
-            <div class="target-row" id="targetRow">
-                <span class="target-label">目标七位数</span>
-                <span class="target-value" id="targetDisplay">——</span>
-            </div>
-
-            <div class="time-set-area" id="timeSettingArea">
-                <div class="time-row">
-                    <div class="time-picker-item">
-                        <label>月</label>
-                        <span class="static-value">2月</span>
-                    </div>
-                    <div class="time-picker-item">
-                        <label>日</label>
-                        <span class="static-value">16日</span>
-                    </div>
-                </div>
-                <div class="time-row">
-                    <div class="time-picker-item">
-                        <label>时</label>
-                        <input type="number" class="time-value" id="hourInput" min="0" max="23" value="22" step="1">
-                    </div>
-                    <div class="time-picker-item">
-                        <label>分</label>
-                        <input type="number" class="time-value" id="minuteInput" min="0" max="59" value="27" step="1">
-                    </div>
-                </div>
-                <button class="confirm-btn" id="confirmTimeBtn">确认时间</button>
-            </div>
+    <!-- 时间设置面板 -->
+    <div class="magic-panel" id="magicPanel">
+        <div class="target-row">
+            <span class="target-label">目标七位数</span>
+            <span class="target-value" id="targetDisplay">——</span>
         </div>
 
-        <!-- 计算器界面 -->
-        <div class="calculator hidden" id="calculatorPanel">
-            <div class="calculator-time" id="calculatorTimeDisplay">
-                <span class="time-info">2月16日 · <span id="selectedTime">22:27</span></span>
+        <div class="time-set-area">
+            <div class="time-row">
+                <div class="time-picker-item">
+                    <label>月</label>
+                    <span class="static-value">2月</span>
+                </div>
+                <div class="time-picker-item">
+                    <label>日</label>
+                    <span class="static-value">16日</span>
+                </div>
             </div>
-            <div class="step-indicator" id="stepMessage">⏳ 请先确认时间</div>
-            <div class="display" id="display">0</div>
-            <div class="buttons">
-                <button class="function" id="clear">AC</button>
-                <button class="function" id="backspace">⌫</button>
-                <button class="function" id="percent">%</button>
-                <button class="operator" id="divide">÷</button>
-
-                <button class="number" id="7">7</button>
-                <button class="number" id="8">8</button>
-                <button class="number" id="9">9</button>
-                <button class="operator" id="multiply">×</button>
-
-                <button class="number" id="4">4</button>
-                <button class="number" id="5">5</button>
-                <button class="number" id="6">6</button>
-                <button class="operator" id="subtract">−</button>
-
-                <button class="number" id="1">1</button>
-                <button class="number" id="2">2</button>
-                <button class="number" id="3">3</button>
-                <button class="operator" id="add">+</button>
-
-                <button class="number zero" id="0">0</button>
-                <button class="number" id="decimal">.</button>
-                <button class="operator" id="equals">=</button>
+            <div class="time-row">
+                <div class="time-picker-item">
+                    <label>时</label>
+                    <input type="number" class="time-value" id="hourInput" min="0" max="23" value="22" step="1">
+                </div>
+                <div class="time-picker-item">
+                    <label>分</label>
+                    <input type="number" class="time-value" id="minuteInput" min="0" max="59" value="27" step="1">
+                </div>
             </div>
+            <button class="confirm-btn" id="confirmTimeBtn">确认时间</button>
+        </div>
+    </div>
+
+    <!-- 计算器界面（初始隐藏） -->
+    <div class="calculator hidden" id="calculatorPanel">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="function" id="clear">AC</button>
+            <button class="function" id="backspace">⌫</button>
+            <button class="function" id="percent">%</button>
+            <button class="operator" id="divide">÷</button>
+
+            <button class="number" id="7">7</button>
+            <button class="number" id="8">8</button>
+            <button class="number" id="9">9</button>
+            <button class="operator" id="multiply">×</button>
+
+            <button class="number" id="4">4</button>
+            <button class="number" id="5">5</button>
+            <button class="number" id="6">6</button>
+            <button class="operator" id="subtract">−</button>
+
+            <button class="number" id="1">1</button>
+            <button class="number" id="2">2</button>
+            <button class="number" id="3">3</button>
+            <button class="operator" id="add">+</button>
+
+            <button class="number zero" id="0">0</button>
+            <button class="number" id="decimal">.</button>
+            <button class="operator" id="equals">=</button>
         </div>
     </div>
 
@@ -509,8 +365,6 @@
             const minuteInput = document.getElementById('minuteInput');
             const confirmBtn = document.getElementById('confirmTimeBtn');
             const targetDisplay = document.getElementById('targetDisplay');
-            const stepMsg = document.getElementById('stepMessage');
-            const selectedTimeEl = document.getElementById('selectedTime');
             const magicPanel = document.getElementById('magicPanel');
             const calculatorPanel = document.getElementById('calculatorPanel');
 
@@ -523,12 +377,12 @@
 
             // 魔术专用
             let step = 0;               // 0:等待确认时间; 1:等待输入四位数; 2:等待按第一次加号; 3:等待输入五位数; 4:等待按第二次加号; 5:等待随机点七下; 6:等待按等于; 7:完成
-            let firstNum = '';           // 四位数 (字符串)
-            let secondNum = '';          // 五位数 (字符串)
-            let sumAfterTwo = null;       // 四位数+五位数的和
-            let magicSeven = '';           // 计算好的七位数
-            let magicIndex = 0;            // 已点次数
-            let targetNumber = 0;           // 目标七位数
+            let firstNum = '';
+            let secondNum = '';
+            let sumAfterTwo = null;
+            let magicSeven = '';
+            let magicIndex = 0;
+            let targetNumber = 0;
 
             // 辅助函数：更新显示
             function updateDisplay() {
@@ -547,13 +401,6 @@
                 }
             }
 
-            // 晃动提示
-            function shakeStepMessage() {
-                stepMsg.classList.add('shake');
-                setTimeout(() => stepMsg.classList.remove('shake'), 400);
-            }
-
-            // 完全重置到初始状态（显示时间设置，隐藏计算器）
             function fullReset() {
                 magicPanel.classList.remove('hidden');
                 calculatorPanel.classList.add('hidden');
@@ -561,12 +408,10 @@
                 minuteInput.disabled = false;
                 confirmBtn.disabled = false;
                 step = 0;
-                stepMsg.innerText = '⏳ 请先确认时间';
                 targetDisplay.innerText = '——';
                 allClear();
             }
 
-            // 确认时间
             function confirmTime() {
                 let h = parseInt(hourInput.value, 10);
                 let m = parseInt(minuteInput.value, 10);
@@ -575,15 +420,9 @@
                 hourInput.value = h;
                 minuteInput.value = m;
 
-                const formattedHour = h.toString().padStart(2, '0');
-                const formattedMinute = m.toString().padStart(2, '0');
-                selectedTimeEl.innerText = `${formattedHour}:${formattedMinute}`;
-
-                // 目标数字 = 2160000 + 小时*100 + 分钟
                 targetNumber = 2160000 + (h * 100) + m;
                 targetDisplay.innerText = targetNumber.toString().padStart(7, '0');
 
-                // 切换界面
                 magicPanel.classList.add('hidden');
                 calculatorPanel.classList.remove('hidden');
 
@@ -591,13 +430,10 @@
                 minuteInput.disabled = true;
                 confirmBtn.disabled = true;
 
-                // 进入步骤1
                 step = 1;
-                stepMsg.innerText = '① 请输入一个四位数';
                 allClear();
             }
 
-            // 完全重置 (AC)
             function allClear() {
                 currentInput = '0';
                 previousOperand = null;
@@ -612,16 +448,13 @@
 
                 if (step >= 1 && step <= 6) {
                     step = 1;
-                    stepMsg.innerText = '① 请输入一个四位数';
                 } else {
                     step = 0;
-                    stepMsg.innerText = '⏳ 请先确认时间';
                     fullReset();
                 }
                 updateDisplay();
             }
 
-            // 清除当前输入逻辑 (C)
             function clearEntry() {
                 if (step === 0) return;
                 currentInput = '0';
@@ -630,24 +463,19 @@
                 if (operator === null && !waitingForSecond && step < 5) {
                     if (step === 1) {
                         firstNum = '';
-                        stepMsg.innerText = '① 请输入一个四位数';
                     } else if (step === 3) {
                         secondNum = '';
-                        stepMsg.innerText = '③ 请输入一个五位数';
                     } else if (step === 2) {
                         firstNum = '';
                         step = 1;
-                        stepMsg.innerText = '① 请输入一个四位数';
                     } else if (step === 4) {
                         secondNum = '';
                         step = 3;
-                        stepMsg.innerText = '③ 请输入一个五位数';
                     }
                 }
                 updateDisplay();
             }
 
-            // 退格 (删除个位数)
             function backspace() {
                 if (step === 0 || step >= 5) return;
 
@@ -656,43 +484,24 @@
                         firstNum = firstNum.slice(0, -1);
                         currentInput = firstNum || '0';
                         step = 1;
-                        if (firstNum.length === 0) {
-                            stepMsg.innerText = '① 请输入一个四位数';
-                        } else {
-                            stepMsg.innerText = `① 请输入一个四位数 (${firstNum.length}/4)`;
-                        }
                     }
                 } else if (step === 3 || step === 4) {
                     if (secondNum.length > 0) {
                         secondNum = secondNum.slice(0, -1);
                         currentInput = secondNum || '0';
                         step = 3;
-                        if (secondNum.length === 0) {
-                            stepMsg.innerText = '③ 请输入一个五位数';
-                        } else {
-                            stepMsg.innerText = `③ 请输入一个五位数 (${secondNum.length}/5)`;
-                        }
                     }
                 }
                 updateDisplay();
             }
 
-            // 数字输入
             function inputDigit(digit) {
-                if (step === 0) {
-                    shakeStepMessage();
-                    return;
-                }
+                if (step === 0) return; // 静默忽略
 
-                // 魔术点按阶段 (step 5)
                 if (step === 5) {
-                    if (magicIndex >= 7) {
-                        stepMsg.innerText = '⑤ 七位已输完，请按 =';
-                        return;
-                    }
-                    if (digit === '.') return; // 忽略小数点
+                    if (magicIndex >= 7) return; // 静默忽略
+                    if (digit === '.') return;
 
-                    // 强制填入预定的七位数当前位
                     const requiredDigit = magicSeven[magicIndex];
                     if (magicIndex === 0) {
                         currentInput = requiredDigit;
@@ -704,65 +513,38 @@
 
                     if (magicIndex === 7) {
                         step = 6;
-                        stepMsg.innerText = '⑥ 请按 = 得到结果';
-                    } else {
-                        stepMsg.innerText = `⑤ 随机点按 (${magicIndex}/7)`;
                     }
                     return;
                 }
 
-                // 普通输入步骤
                 if (step === 1 || step === 2) {
-                    if (step === 2) {
-                        shakeStepMessage();
-                        return;
-                    }
-                    if (firstNum.length >= 4) {
-                        shakeStepMessage();
-                        return;
-                    }
+                    if (step === 2) return; // 静默忽略
+                    if (firstNum.length >= 4) return; // 静默忽略
                     if (digit === '.') return;
 
                     firstNum += digit;
                     currentInput = firstNum;
                     if (firstNum.length === 4) {
                         step = 2;
-                        stepMsg.innerText = '② 请按加号 +';
-                    } else {
-                        stepMsg.innerText = `① 请输入一个四位数 (${firstNum.length}/4)`;
                     }
                     updateDisplay();
                 } else if (step === 3 || step === 4) {
-                    if (step === 4) {
-                        shakeStepMessage();
-                        return;
-                    }
-                    if (secondNum.length >= 5) {
-                        shakeStepMessage();
-                        return;
-                    }
+                    if (step === 4) return; // 静默忽略
+                    if (secondNum.length >= 5) return; // 静默忽略
                     if (digit === '.') return;
 
                     secondNum += digit;
                     currentInput = secondNum;
                     if (secondNum.length === 5) {
                         step = 4;
-                        stepMsg.innerText = '④ 请再按一次加号 +';
-                    } else {
-                        stepMsg.innerText = `③ 请输入一个五位数 (${secondNum.length}/5)`;
                     }
                     updateDisplay();
-                } else {
-                    shakeStepMessage();
                 }
+                // 其他步骤（如6,7）输入数字静默忽略
             }
 
-            // 处理加号
             function handlePlus() {
-                if (step === 0) {
-                    shakeStepMessage();
-                    return;
-                }
+                if (step === 0) return;
 
                 if (step === 2) {
                     if (firstNum.length === 4) {
@@ -772,77 +554,59 @@
                         waitingForSecond = true;
                         clearOnNextDigit = true;
                         step = 3;
-                        stepMsg.innerText = '③ 请输入一个五位数';
                         updateDisplay();
-                    } else {
-                        shakeStepMessage();
                     }
+                    // 否则静默忽略
                 } else if (step === 4) {
                     if (secondNum.length === 5) {
                         const first = parseFloat(firstNum);
                         const second = parseFloat(secondNum);
                         sumAfterTwo = first + second;
 
-                        // 计算需要的魔术数字（目标数 - 前两个数的和）
                         const diff = targetNumber - sumAfterTwo;
                         if (diff < 0 || diff > 9999999) {
-                            stepMsg.innerText = '❌ 数值超出范围，请按AC重置';
+                            // 静默忽略（不处理，可以重置状态，但为简化，直接返回）
                             return;
                         }
                         magicSeven = diff.toString().padStart(7, '0');
-                        if (magicSeven.length !== 7) {
-                            stepMsg.innerText = '❌ 计算错误，请重试';
-                            return;
-                        }
+                        if (magicSeven.length !== 7) return;
 
-                        // 显示前两个数的和（让观众看到结果）
                         currentInput = sumAfterTwo.toString();
                         previousOperand = sumAfterTwo;
-                        operator = null;  // 清除运算符，准备进入点按阶段
+                        operator = null;
                         waitingForSecond = false;
                         clearOnNextDigit = true;
 
                         step = 5;
                         magicIndex = 0;
-                        stepMsg.innerText = '⑤ 请随机点7下数字 (任意键)';
                         updateDisplay();
-                    } else {
-                        shakeStepMessage();
                     }
-                } else {
-                    shakeStepMessage();
+                    // 否则静默忽略
                 }
+                // 其他步骤静默忽略
             }
 
-            // 处理等于
             function handleEquals() {
                 if (step === 6) {
-                    if (magicIndex !== 7) {
-                        shakeStepMessage();
-                        return;
-                    }
-                    // 此时 currentInput 应该已经是 magicSeven 的七位数
-                    // 最终结果 = sumAfterTwo + parseInt(magicSeven) 应该等于 targetNumber
+                    if (magicIndex !== 7) return;
                     const finalSum = sumAfterTwo + parseInt(magicSeven);
                     currentInput = finalSum.toString().padStart(7, '0');
                     step = 7;
-                    stepMsg.innerText = `✨ 魔术成功！得到目标数: ${targetNumber}`;
                     updateDisplay();
-                } else {
-                    shakeStepMessage();
                 }
+                // 其他步骤静默忽略
             }
 
-            // 其他运算符禁用
             function handleOtherOperator() {
-                if (step !== 0) shakeStepMessage();
+                // 其他运算符（除加号外）在任何步骤都静默忽略
+                return;
             }
 
             function handlePercent() {
-                if (step !== 0) shakeStepMessage();
+                // 百分号静默忽略
+                return;
             }
 
-            // 清除按钮逻辑
             function handleClear() {
                 if (step === 0) return;
                 if (clearBtn.innerText === 'AC') {
@@ -904,7 +668,7 @@
                 }
                 if (['-', '*', '/', '%', '.'].includes(key)) {
                     e.preventDefault();
-                    if (step !== 0) shakeStepMessage();
+                    // 静默忽略
                 }
             });
 
@@ -916,7 +680,6 @@
                 minuteInput.disabled = false;
                 confirmBtn.disabled = false;
                 step = 0;
-                stepMsg.innerText = '⏳ 请先确认时间';
                 targetDisplay.innerText = '——';
                 allClear();
 
